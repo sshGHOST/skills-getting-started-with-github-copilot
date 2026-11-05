@@ -109,7 +109,7 @@ section h3 {
 
 .participants-list {
   display: grid;
-  gap: 5px;
+  gap: 7px;
   padding-left: 0;
   list-style: none;
   color: #424b62;
@@ -118,15 +118,44 @@ section h3 {
 }
 
 .participants-list li {
-  position: relative;
-  padding-left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.participants-list li::before {
-  position: absolute;
-  left: 2px;
-  color: #5c6bc0;
-  content: "•";
+.remove-participant-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border: 1px solid #f0caca;
+  border-radius: 7px;
+  background-color: #fff5f5;
+  color: #b42318;
+}
+
+.remove-participant-button:hover {
+  background-color: #fee4e2;
+}
+
+.remove-participant-button:focus-visible {
+  outline: 2px solid #b42318;
+  outline-offset: 2px;
+}
+
+.remove-participant-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.remove-participant-button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .activity-card .no-participants {

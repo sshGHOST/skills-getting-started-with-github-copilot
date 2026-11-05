@@ -63,7 +63,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
           details.participants.forEach((participant) => {
             const listItem = document.createElement("li");
-            listItem.textContent = participant;
+            const participantEmail = document.createElement("span");
+            participantEmail.textContent = participant;
+            listItem.appendChild(participantEmail);
+
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "remove-participant-button";
+            removeButton.setAttribute("aria-label", `Unregister ${participant} from ${name}`);
+            removeButton.title = "Unregister participant";
+
+            const deleteIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            deleteIcon.setAttribute("viewBox", "0 0 24 24");
+            deleteIcon.setAttribute("aria-hidden", "true");
+            deleteIcon.setAttribute("focusable", "false");
+
+            const deletePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            deletePath.setAttribute(
+              "d",
+              "M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-1 12H7L6 9Zm3 2v8h2v-8H9Zm4 0v8h2v-8h-2Z"
+            );
+            deleteIcon.appendChild(deletePath);
+            removeButton.appendChild(deleteIcon);
+            removeButton.dataset.activity = name;
+            removeButton.dataset.email = participant;
+            listItem.appendChild(removeButton);
             participantsList.appendChild(listItem);
           });
 
@@ -130,6 +154,48 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
     }
+  });
+
+  activitiesList.addEventListener("click", async (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const removeButton = event.target.closest(".remove-participant-button");
+    if (!removeButton) {
+      return;
+    }
+
+    const { activity, email } = removeButton.dataset;
+    if (!activity || !email) {
+      return;
+    }
+
+    removeButton.disabled = true;
+    try {
+      const response = await fetch(
+        `/activities/${encodeURIComponent(activity)}/participants?email=${encodeURIComponent(email)}`,
+        { method: "DELETE" }
+      );
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.detail || "Failed to unregister participant");
+      }
+
+      messageDiv.textContent = result.message;
+      messageDiv.className = "success";
+      await fetchActivities();
+    } catch (error) {
+      messageDiv.textContent = error.message || "Failed to unregister participant. Please try again.";
+      messageDiv.className = "error";
+      console.error("Error unregistering participant:", error);
+    }
+
+    messageDiv.classList.remove("hidden");
+    setTimeout(() => {
+      messageDiv.classList.add("hidden");
+    }, 5000);
   });
 
   // Initialize app
